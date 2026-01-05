@@ -460,7 +460,7 @@ function ProductList() {
                       <p className="flex justify-between font-medium border-t pt-2">
                         <span>Total with GST:</span>
                         <span className="text-green-600">
-                          ₹{(Number(editData.offerPrice) + (Number(editData.offerPrice) * Number(editData.gstPercentage) / 100)).toFixed(2)}
+                          ₹{(Number(editData.price) + (Number(editData.price) * Number(editData.gstPercentage) / 100)).toFixed(2)}
                         </span>
                       </p>
                     </div>

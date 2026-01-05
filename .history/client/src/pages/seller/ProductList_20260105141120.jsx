@@ -441,7 +441,7 @@ function ProductList() {
                       step="0.01"
                       min="0"
                     />
-                  </div>
+                  </div>offerPrice
                 </div>
 
                 {/* Price Preview with GST */}
@@ -451,16 +451,16 @@ function ProductList() {
                     <div className="space-y-1 text-sm">
                       <p className="flex justify-between">
                         <span>Base Price:</span>
-                        <span>₹{Number(editData.offerPrice).toFixed(2)}</span>
+                        <span>₹{Number(editData.price).toFixed(2)}</span>
                       </p>
                       <p className="flex justify-between">
                         <span>GST ({editData.gstPercentage}%):</span>
-                        <span>₹{(Number(editData.offerPrice) * Number(editData.gstPercentage) / 100).toFixed(2)}</span>
+                        <span>₹{(Number(editData.price) * Number(editData.gstPercentage) / 100).toFixed(2)}</span>
                       </p>
                       <p className="flex justify-between font-medium border-t pt-2">
                         <span>Total with GST:</span>
                         <span className="text-green-600">
-                          ₹{(Number(editData.offerPrice) + (Number(editData.offerPrice) * Number(editData.gstPercentage) / 100)).toFixed(2)}
+                          ₹{(Number(editData.price) + (Number(editData.price) * Number(editData.gstPercentage) / 100)).toFixed(2)}
                         </span>
                       </p>
                     </div>
