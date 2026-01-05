@@ -387,10 +387,10 @@ function ProductList() {
                     ))}
                   </select>
                   <p className="text-sm text-gray-500 mt-1">
-                    {editData.offerPrice && editData.gstPercentage ? (
+                    {editData.price && editData.gstPercentage ? (
                       <span>
                         GST Amount: ₹{(Number(editData.offerPrice) * Number(editData.gstPercentage) / 100).toFixed(2)} | 
-                        Total with GST: ₹{(Number(editData.offerPrice) + (Number(editData.offerPrice) * Number(editData.gstPercentage) / 100)).toFixed(2)}
+                        Total with GST: ₹{(Number(editData.price) + (Number(editData.price) * Number(editData.gstPercentage) / 100)).toFixed(2)}
                       </span>
                     ) : (
                       "Select applicable GST slab"
