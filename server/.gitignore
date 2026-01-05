@@ -1,0 +1,4 @@
+.env
+# .gitignore file में ये लाइन्स add करें
+node_modules/
+server/node_modules/
