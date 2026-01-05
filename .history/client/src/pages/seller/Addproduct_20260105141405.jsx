@@ -314,7 +314,7 @@ function Addproduct() {
                 </p>
                 <p className="flex justify-between font-medium border-t pt-2">
                   <span>Total with GST:</span>
-                  <span>₹{(Number(offerPrice) + (Number(offerPrice) * Number(gstPercentage) / 100)).toFixed(2)}</span>
+                  <span>₹{(Number(offerPrice) + (Number(price) * Number(gstPercentage) / 100)).toFixed(2)}</span>
                 </p>
               </div>
             </div>

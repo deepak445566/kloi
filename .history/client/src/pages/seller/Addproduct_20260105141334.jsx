@@ -306,15 +306,15 @@ function Addproduct() {
               <div className="space-y-1 text-sm">
                 <p className="flex justify-between">
                   <span>Base Price:</span>
-                  <span>₹{Number(offerPrice).toFixed(2)}</span>
+                  <span>₹{Number(price).toFixed(2)}</span>
                 </p>
                 <p className="flex justify-between">
                   <span>GST ({gstPercentage}%):</span>
-                  <span>₹{(Number(offerPrice) * Number(gstPercentage) / 100).toFixed(2)}</span>
+                  <span>₹{(Number(price) * Number(gstPercentage) / 100).toFixed(2)}</span>
                 </p>
                 <p className="flex justify-between font-medium border-t pt-2">
                   <span>Total with GST:</span>
-                  <span>₹{(Number(offerPrice) + (Number(offerPrice) * Number(gstPercentage) / 100)).toFixed(2)}</span>
+                  <span>₹{(Number(price) + (Number(price) * Number(gstPercentage) / 100)).toFixed(2)}</span>
                 </p>
               </div>
             </div>
