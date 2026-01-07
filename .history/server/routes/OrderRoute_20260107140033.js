@@ -17,7 +17,6 @@ import {
 } from "../controllers/shiprocketController.js";
 import authSeller from "../middlewares/authSeller.js";
 import authUser from "../middlewares/authUser.js";
-import { generateInvoice } from "../controllers/invoiceController.js";
 
 const orderRouter = express.Router();
 
