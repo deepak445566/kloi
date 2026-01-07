@@ -2,22 +2,15 @@ import React, { useEffect, useState, useRef } from 'react'
 import { assets } from '../../assets/assets';
 import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
-import { 
-  X, Package, User, MapPin, Calendar, Hash, CheckCircle, Tag, Layers, 
-  Download, FileText, Printer, Mail, Truck, PackageCheck, ShieldCheck,
-  ClipboardCheck, AlertCircle, RefreshCw, Eye, Send, ExternalLink
-} from 'lucide-react';
+import { X, Package, User, MapPin, Calendar, Hash, CheckCircle, Tag, Layers, Download, FileText, Printer, Mail } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-function Orders() {
+function Order() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(null);
-  const [trackingInfo, setTrackingInfo] = useState(null);
-  const [generatingLabel, setGeneratingLabel] = useState(null);
-  const [showShiprocketModal, setShowShiprocketModal] = useState(false);
   const { axios } = useAppContext();
   const invoiceRef = useRef();
 
@@ -41,111 +34,6 @@ function Orders() {
     fetchOrders();
   }, []);
 
-  // Shiprocket Functions
-  const generateShippingLabel = async (orderId) => {
-    try {
-      setGeneratingLabel(orderId);
-      toast.loading('Generating shipping label...');
-      
-      const { data } = await axios.post(`/api/order/generate-label/${orderId}`);
-      toast.dismiss();
-      
-      if (data.success) {
-        toast.success('Shipping label generated successfully!');
-        
-        // Update the order in state
-        setOrders(prevOrders => 
-          prevOrders.map(order => 
-            order._id === orderId 
-              ? { 
-                  ...order, 
-                  awbNumber: data.awbNumber,
-                  shippingInfo: {
-                    ...order.shippingInfo,
-                    shippingStatus: 'AWB Generated'
-                  }
-                } 
-              : order
-          )
-        );
-        
-        // Open label URL if available
-        if (data.labelUrl) {
-          window.open(data.labelUrl, '_blank');
-        }
-      }
-    } catch (error) {
-      toast.dismiss();
-      console.error('Error generating label:', error);
-      toast.error('Failed to generate shipping label');
-    } finally {
-      setGeneratingLabel(null);
-    }
-  };
-
-  const trackShipment = async (orderId, awbNumber) => {
-    try {
-      const { data } = await axios.get(`/api/order/track/${orderId}`);
-      if (data.success) {
-        setTrackingInfo({
-          orderId,
-          ...data.tracking
-        });
-        setShowShiprocketModal(true);
-      }
-    } catch (error) {
-      console.error('Error tracking shipment:', error);
-      toast.error('Failed to track shipment');
-    }
-  };
-
-  const updateOrderStatus = async (orderId, status) => {
-    try {
-      const { data } = await axios.put(`/api/order/status/${orderId}`, { status });
-      if (data.success) {
-        toast.success('Order status updated');
-        fetchOrders();
-      }
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update status');
-    }
-  };
-
-  const sendWhatsApp = async (orderId) => {
-    try {
-      const { data } = await axios.get(`/api/order/whatsapp/${orderId}`);
-      if (data.success) {
-        window.open(data.whatsappUrl, '_blank');
-      }
-    } catch (error) {
-      toast.error('Failed to generate WhatsApp link');
-    }
-  };
-
-  const getShippingStatusColor = (status) => {
-    switch (status) {
-      case 'Created': return 'bg-blue-100 text-blue-800';
-      case 'AWB Generated': return 'bg-purple-100 text-purple-800';
-      case 'Picked Up': return 'bg-indigo-100 text-indigo-800';
-      case 'In Transit': return 'bg-yellow-100 text-yellow-800';
-      case 'Delivered': return 'bg-green-100 text-green-800';
-      case 'Cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Order Placed': return '📦';
-      case 'Processing': return '⚙️';
-      case 'Shipped': return '🚚';
-      case 'Delivered': return '✅';
-      case 'Cancelled': return '❌';
-      default: return '📋';
-    }
-  };
-
   const handleOrderClick = (order) => {
     setSelectedOrder(order);
   };
@@ -154,7 +42,7 @@ function Orders() {
     setSelectedOrder(null);
   };
 
-  // Invoice functions (same as before)
+  // Function to generate invoice HTML
   const generateInvoiceHTML = (order) => {
     if (!order) return '';
     
@@ -162,6 +50,7 @@ function Orders() {
     const formattedDate = orderDate.toLocaleDateString('en-IN');
     const formattedTime = orderDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
     
+    // Calculate GST breakdown
     let totalGST = 0;
     let totalAmount = 0;
     
@@ -189,6 +78,7 @@ function Orders() {
 
     return `
       <div id="invoice-content" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white;">
+        <!-- Header -->
         <div style="border-bottom: 2px solid #4FBF8B; padding-bottom: 20px; margin-bottom: 30px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -205,12 +95,14 @@ function Orders() {
           </div>
         </div>
 
+        <!-- Seller & Customer Info -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
           <div>
             <h3 style="color: #333; margin-bottom: 10px; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Seller Details</h3>
             <p style="margin: 5px 0; color: #555;"><strong>KuntalAgroAgencies</strong></p>
             <p style="margin: 5px 0; color: #555;">Farm & Garden Products</p>
             <p style="margin: 5px 0; color: #555;">+918586845185 </p>
+           
           </div>
           
           ${order.address ? `
@@ -225,20 +117,7 @@ function Orders() {
           ` : ''}
         </div>
 
-        ${order.awbNumber ? `
-          <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
-            <h3 style="color: #0369a1; margin-bottom: 10px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-              📦 Shipping Information
-            </h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <p style="margin: 5px 0; color: #555;"><strong>AWB Number:</strong> ${order.awbNumber}</p>
-              <p style="margin: 5px 0; color: #555;"><strong>Status:</strong> ${order.shippingInfo?.shippingStatus || 'Processing'}</p>
-              <p style="margin: 5px 0; color: #555;"><strong>Courier:</strong> ${order.courierName || 'To be assigned'}</p>
-              <p style="margin: 5px 0; color: #555;"><strong>Shipment ID:</strong> ${order.shiprocketShipmentId?.slice(-8) || 'N/A'}</p>
-            </div>
-          </div>
-        ` : ''}
-
+        <!-- Order Details -->
         <div style="margin-bottom: 20px;">
           <h3 style="color: #333; margin-bottom: 10px; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Order Information</h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9f9f9; padding: 15px; border-radius: 5px;">
@@ -248,11 +127,12 @@ function Orders() {
             </div>
             <div>
               <p style="margin: 5px 0; color: #555;"><strong>Payment Method:</strong> ${order.paymentType || 'Online Payment'}</p>
-              <p style="margin: 5px 0; color: #555;"><strong>Order Status:</strong> ${order.status || 'Order Placed'}</p>
+              <p style="margin: 5px 0; color: #555;"><strong>Delivery:</strong> Standard Shipping</p>
             </div>
           </div>
         </div>
 
+        <!-- Items Table -->
         <div style="margin-bottom: 30px;">
           <h3 style="color: #333; margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Order Items</h3>
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -260,9 +140,11 @@ function Orders() {
               <tr style="background: #4FBF8B; color: white;">
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">#</th>
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Product</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Category</th>
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Qty</th>
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Price</th>
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">GST %</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">GST Amount</th>
                 <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Total</th>
               </tr>
             </thead>
@@ -276,9 +158,11 @@ function Orders() {
                       <strong>${product.name || 'Product'}</strong>
                       ${product.weightValue ? `<br/><small>${product.weightValue} ${product.weightUnit || ''}</small>` : ''}
                     </td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">${product.category || 'N/A'}</td>
                     <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.quantity || 1}</td>
                     <td style="padding: 12px; border: 1px solid #ddd;">₹${item.unitPrice?.toFixed(2) || '0.00'}</td>
                     <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${item.gstPercentage || 5}%</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">₹${item.gstAmount?.toFixed(2) || '0.00'}</td>
                     <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; color: #4FBF8B;">₹${item.itemTotal?.toFixed(2) || '0.00'}</td>
                   </tr>
                 `;
@@ -287,6 +171,7 @@ function Orders() {
           </table>
         </div>
 
+        <!-- Summary -->
         <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
           <h3 style="color: #333; margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Order Summary</h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -309,28 +194,62 @@ function Orders() {
                 <span>Grand Total:</span>
                 <span style="color: #4FBF8B; font-size: 24px;">₹${totalAmount.toFixed(2)}</span>
               </p>
+              <p style="margin: 8px 0; display: flex; justify-content: space-between;">
+                <span>Amount in Words:</span>
+                <span style="font-style: italic;">${numberToWords(totalAmount)} only</span>
+              </p>
             </div>
           </div>
         </div>
 
+        <!-- Footer -->
         <div style="border-top: 2px solid #4FBF8B; padding-top: 20px; margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
           <p>Thank you for your business with KuntalAgroAgencies</p>
-          <p>For any queries, contact: +91 8586845185</p>
+          <p>For any queries, contact: +91 8586845185 </p>
+         
         </div>
       </div>
     `;
   };
 
+  // Function to convert number to words
+  const numberToWords = (num) => {
+    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    
+    const convert = (n) => {
+      if (n < 10) return units[n];
+      if (n < 20) return teens[n - 10];
+      if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + units[n % 10] : '');
+      if (n < 1000) return units[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' and ' + convert(n % 100) : '');
+      return '';
+    };
+    
+    const rupees = Math.floor(num);
+    const paise = Math.round((num - rupees) * 100);
+    
+    let result = convert(rupees) + ' Rupees';
+    if (paise > 0) {
+      result += ' and ' + convert(paise) + ' Paise';
+    }
+    
+    return result;
+  };
+
+  // Function to download invoice as PDF
   const downloadInvoice = async (order) => {
     try {
       setDownloadingInvoice(order._id);
       
+      // Create temporary div for invoice
       const tempDiv = document.createElement('div');
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
       tempDiv.innerHTML = generateInvoiceHTML(order);
       document.body.appendChild(tempDiv);
       
+      // Use html2canvas to capture the invoice
       const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
@@ -338,8 +257,10 @@ function Orders() {
         backgroundColor: '#ffffff'
       });
       
+      // Remove temporary div
       document.body.removeChild(tempDiv);
       
+      // Create PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -347,8 +268,8 @@ function Orders() {
       });
       
       const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;
-      const pageHeight = 295;
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
       let heightLeft = imgHeight;
@@ -364,6 +285,7 @@ function Orders() {
         heightLeft -= pageHeight;
       }
       
+      // Save PDF
       const fileName = `Invoice_${order._id.slice(-8)}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
       
@@ -376,6 +298,7 @@ function Orders() {
     }
   };
 
+  // Function to print invoice
   const printInvoice = (order) => {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
@@ -403,6 +326,66 @@ function Orders() {
     printWindow.document.close();
   };
 
+  // Function to get color based on category
+  const getCategoryColor = (category) => {
+    const colorMap = {
+      "Crop": "bg-green-50 text-green-800 border-green-200",
+      "Fertilizer": "bg-blue-50 text-blue-800 border-blue-200",
+      "Pesticide": "bg-red-50 text-red-800 border-red-200",
+      "Household Items": "bg-purple-50 text-purple-800 border-purple-200",
+      "Sprayers": "bg-amber-50 text-amber-800 border-amber-200",
+      "Sprayers Parts": "bg-cyan-50 text-cyan-800 border-cyan-200",
+      "Terrace Gardening": "bg-emerald-50 text-emerald-800 border-emerald-200",
+      "Household Insecticides": "bg-orange-50 text-orange-800 border-orange-200",
+      "Farm Machinery": "bg-gray-100 text-gray-800 border-gray-300",
+      "Plantation": "bg-lime-50 text-lime-800 border-lime-200"
+    };
+    
+    return colorMap[category] || "bg-gray-100 text-gray-800 border-gray-300";
+  };
+
+  // Function to get subcategory color
+  const getSubCategoryColor = (category, subCategory) => {
+    if (category === "Fertilizer") {
+      if (subCategory === "Organic") return "bg-green-100 text-green-900 border-green-300";
+      if (subCategory === "Non-organic") return "bg-yellow-100 text-yellow-900 border-yellow-300";
+    }
+    
+    if (category === "Crop") {
+      if (subCategory === "Field Crop") return "bg-teal-100 text-teal-900 border-teal-300";
+      if (subCategory === "Vegetable Crop") return "bg-emerald-100 text-emerald-900 border-emerald-300";
+    }
+    
+    if (category === "Pesticide") {
+      if (subCategory === "Herbicides") return "bg-red-100 text-red-900 border-red-300";
+      if (subCategory === "Insecticides") return "bg-orange-100 text-orange-900 border-orange-300";
+      if (subCategory === "Fungicides") return "bg-purple-100 text-purple-900 border-purple-300";
+    }
+    
+    return "bg-gray-100 text-gray-800 border-gray-300";
+  };
+
+  // Function to get emoji for subcategory
+  const getSubCategoryEmoji = (category, subCategory) => {
+    if (category === "Fertilizer") {
+      if (subCategory === "Organic") return "🌱";
+      if (subCategory === "Non-organic") return "⚗️";
+    }
+    
+    if (category === "Crop") {
+      if (subCategory === "Field Crop") return "🌾";
+      if (subCategory === "Vegetable Crop") return "🥦";
+    }
+    
+    if (category === "Pesticide") {
+      if (subCategory === "Herbicides") return "🚫";
+      if (subCategory === "Insecticides") return "🐛";
+      if (subCategory === "Fungicides") return "🍄";
+    }
+    
+    return "";
+  };
+
   if (loading) {
     return (
       <div className='no-scrollbar flex-1 h-[95vh] overflow-y-scroll'>
@@ -420,12 +403,11 @@ function Orders() {
     <>
       <div className='no-scrollbar flex-1 h-[95vh] overflow-y-scroll'>
         <div className="md:p-10 p-4 space-y-4">
-          {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">Orders Management</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Orders List</h2>
               <p className="text-gray-600 text-sm mt-1">
-                {orders.length} orders found • {orders.filter(o => o.shippingInfo?.hasShiprocket).length} with shipping
+                {orders.length} orders found
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -433,70 +415,14 @@ function Orders() {
                 onClick={fetchOrders}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center gap-2"
               >
-                <RefreshCw className="w-4 h-4" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
                 Refresh
               </button>
             </div>
           </div>
           
-          {/* Shiprocket Tracking Modal */}
-          {showShiprocketModal && trackingInfo && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full">
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Truck className="w-8 h-8 text-blue-600" />
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-800">Shipment Tracking</h3>
-                      <p className="text-sm text-gray-500">AWB: {trackingInfo.awbNumber || 'Loading...'}</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setShowShiprocketModal(false)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <X className="w-6 h-6 text-gray-500" />
-                  </button>
-                </div>
-                <div className="p-6">
-                  {trackingInfo.tracking_data ? (
-                    <div className="space-y-4">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-bold text-blue-800">Current Status</p>
-                            <p className="text-lg">{trackingInfo.tracking_data.shipment_status || 'Unknown'}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-gray-600">Last Updated</p>
-                            <p>{trackingInfo.tracking_data.last_event_time || 'N/A'}</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <h4 className="font-bold text-gray-800">Tracking History</h4>
-                        {trackingInfo.tracking_data.shipment_track_activities?.map((event, index) => (
-                          <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
-                            <p className="font-medium">{event.activity}</p>
-                            <p className="text-sm text-gray-600">{event.location}</p>
-                            <p className="text-xs text-gray-500">{event.date}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-                      <p className="text-gray-700">Tracking information not available</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          
-          {/* Orders List */}
           {orders.length === 0 ? (
             <div className="flex flex-col justify-center items-center h-64">
               <Package className="w-16 h-16 text-gray-400 mb-4" />
@@ -510,7 +436,6 @@ function Orders() {
                   key={index} 
                   className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200 bg-white"
                 >
-                  {/* Order Info */}
                   <div 
                     onClick={() => handleOrderClick(order)}
                     className="flex-1 cursor-pointer"
@@ -523,36 +448,57 @@ function Orders() {
                         )}
                       </div>
                       <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold text-gray-800">
-                            Order #{order._id?.slice(-8)}
-                          </span>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getShippingStatusColor(order.shippingInfo?.shippingStatus)}`}>
-                            {order.shippingInfo?.shippingStatus || 'Not Initiated'}
-                          </span>
-                        </div>
-                        
-                        {order.items && order.items.slice(0, 1).map((item, itemIndex) => (
-                          <p key={itemIndex} className="text-sm text-gray-600">
-                            {item?.product?.name || 'Product'} x {item?.quantity || 1}
+                        {order.items && order.items.slice(0, 2).map((item, itemIndex) => {
+                          const hasSubcategory = ["Crop", "Fertilizer", "Pesticide"].includes(item?.product?.category);
+                          
+                          return (
+                            <div key={itemIndex} className="flex flex-col gap-1">
+                              <p className="font-medium text-gray-800 text-sm">
+                                {item?.product?.name || 'Unknown Product'} 
+                                <span className={`text-green-600 ml-2 ${(!item?.quantity || item.quantity < 2) && "hidden"}`}>
+                                  x {item?.quantity || 0}
+                                </span>
+                              </p>
+                              
+                              {/* Category and Subcategory Badges */}
+                              {item?.product?.category && (
+                                <div className="flex flex-wrap items-center gap-1">
+                                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCategoryColor(item.product.category)}`}>
+                                    <Tag className="inline w-3 h-3 mr-1" />
+                                    {item.product.category}
+                                  </span>
+                                  
+                                  {hasSubcategory && item?.product?.subCategory && (
+                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getSubCategoryColor(item.product.category, item.product.subCategory)}`}>
+                                      <Layers className="inline w-3 h-3 mr-1" />
+                                      {getSubCategoryEmoji(item.product.category, item.product.subCategory)} {item.product.subCategory}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {order.items && order.items.length > 2 && (
+                          <p className="text-xs text-gray-500">
+                            +{order.items.length - 2} more items
                           </p>
-                        ))}
-                        
-                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <User className="w-3 h-3" />
-                            {order.address?.firstname || 'Customer'}
-                          </span>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  {/* Amount & Payment */}
+                  <div className="text-sm text-gray-600 md:text-center">
+                    {order.address ? (
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        <span className="text-xs">{order.address.firstname || ''} {order.address.lastname || ''}</span>
+                      </div>
+                    ) : (
+                      <p className='text-red-500 text-xs'>No address</p>
+                    )}
+                  </div>
+
                   <div className="flex flex-col items-end md:items-center gap-1">
                     <p className="font-bold text-lg text-gray-800">
                       ₹{order.amount || 0}
@@ -568,89 +514,42 @@ function Orders() {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-2">
-                    {/* Status Badge */}
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${order.isPaid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                       {order.isPaid ? "Paid" : "Pending"}
                     </div>
                     
-                    {/* Shiprocket Actions */}
-                    <div className="flex gap-1">
-                      {/* Generate Label Button */}
-                      {order.status === "Processing" && !order.awbNumber && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            generateShippingLabel(order._id);
-                          }}
-                          disabled={generatingLabel === order._id}
-                          className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-xs font-medium disabled:opacity-50"
-                          title="Generate Shipping Label"
-                        >
-                          {generatingLabel === order._id ? (
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <FileText className="w-3 h-3" />
-                          )}
-                        </button>
+                    {/* Invoice Download Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadInvoice(order);
+                      }}
+                      disabled={downloadingInvoice === order._id}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                    >
+                      {downloadingInvoice === order._id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" />
+                          Invoice
+                        </>
                       )}
-                      
-                      {/* Track Button */}
-                      {order.awbNumber && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            trackShipment(order._id, order.awbNumber);
-                          }}
-                          className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 hover:bg-green-100 rounded text-xs font-medium"
-                          title="Track Shipment"
-                        >
-                          <Truck className="w-3 h-3" />
-                        </button>
-                      )}
-                      
-                      {/* WhatsApp Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          sendWhatsApp(order._id);
-                        }}
-                        className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 hover:bg-green-100 rounded text-xs font-medium"
-                        title="Send WhatsApp"
-                      >
-                        <Send className="w-3 h-3" />
-                      </button>
-                      
-                      {/* Invoice Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          downloadInvoice(order);
-                        }}
-                        disabled={downloadingInvoice === order._id}
-                        className="flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded text-xs font-medium disabled:opacity-50"
-                        title="Download Invoice"
-                      >
-                        {downloadingInvoice === order._id ? (
-                          <RefreshCw className="w-3 h-3 animate-spin" />
-                        ) : (
-                          <Download className="w-3 h-3" />
-                        )}
-                      </button>
-                      
-                      {/* View Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOrderClick(order);
-                        }}
-                        className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded text-xs font-medium"
-                        title="View Details"
-                      >
-                        <Eye className="w-3 h-3" />
-                      </button>
-                    </div>
+                    </button>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOrderClick(order);
+                      }}
+                      className="px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      View
+                    </button>
                   </div>
                 </div>
               ))}
@@ -673,46 +572,6 @@ function Orders() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Shiprocket Actions in Modal */}
-                {selectedOrder.status === "Processing" && !selectedOrder.awbNumber && (
-                  <button
-                    onClick={() => generateShippingLabel(selectedOrder._id)}
-                    disabled={generatingLabel === selectedOrder._id}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
-                  >
-                    {generatingLabel === selectedOrder._id ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Truck className="w-4 h-4" />
-                        Generate Label
-                      </>
-                    )}
-                  </button>
-                )}
-                
-                {selectedOrder.awbNumber && (
-                  <button
-                    onClick={() => trackShipment(selectedOrder._id, selectedOrder.awbNumber)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors text-sm font-medium"
-                  >
-                    <Truck className="w-4 h-4" />
-                    Track Shipment
-                  </button>
-                )}
-                
-                {/* WhatsApp in Modal */}
-                <button
-                  onClick={() => sendWhatsApp(selectedOrder._id)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white hover:bg-green-600 rounded-lg transition-colors text-sm font-medium"
-                >
-                  <Send className="w-4 h-4" />
-                  WhatsApp
-                </button>
-                
                 {/* Invoice Actions */}
                 <button
                   onClick={() => downloadInvoice(selectedOrder)}
@@ -721,7 +580,7 @@ function Orders() {
                 >
                   {downloadingInvoice === selectedOrder._id ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700"></div>
                       Processing...
                     </>
                   ) : (
@@ -751,64 +610,22 @@ function Orders() {
 
             {/* Modal Content */}
             <div className="p-6 space-y-6">
-              {/* Shipping Information Card */}
-              {(selectedOrder.awbNumber || selectedOrder.shippingInfo?.hasShiprocket) && (
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Truck className="w-8 h-8 text-blue-600" />
-                      <div>
-                        <h3 className="font-bold text-blue-800">Shipping Information</h3>
-                        <div className="flex flex-wrap gap-4 mt-2">
-                          {selectedOrder.awbNumber && (
-                            <div>
-                              <p className="text-sm text-blue-700">AWB Number</p>
-                              <p className="font-bold text-blue-900 text-lg">{selectedOrder.awbNumber}</p>
-                            </div>
-                          )}
-                          {selectedOrder.shippingInfo?.shippingStatus && (
-                            <div>
-                              <p className="text-sm text-blue-700">Shipping Status</p>
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getShippingStatusColor(selectedOrder.shippingInfo.shippingStatus)}`}>
-                                {selectedOrder.shippingInfo.shippingStatus}
-                              </span>
-                            </div>
-                          )}
-                          {selectedOrder.courierName && (
-                            <div>
-                              <p className="text-sm text-blue-700">Courier</p>
-                              <p className="font-medium">{selectedOrder.courierName}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      {selectedOrder.awbNumber && (
-                        <button
-                          onClick={() => window.open(`https://shiprocket.co/tracking/${selectedOrder.awbNumber}`, '_blank')}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-white text-blue-700 border border-blue-300 hover:bg-blue-50 rounded-lg text-sm font-medium"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Open Tracking
-                        </button>
-                      )}
-                    </div>
-                  </div>
+              {/* Invoice Header for Print */}
+              <div className="hidden print:block">
+                <div className="text-center mb-6">
+                  <h1 className="text-3xl font-bold text-green-600">GreenMantra</h1>
+                  <p className="text-gray-600">Farm & Garden Solutions</p>
+                  <p className="text-gray-500 text-sm">Invoice #{selectedOrder._id?.slice(-8)}</p>
                 </div>
-              )}
+              </div>
 
-              {/* Rest of the modal content (same as before) */}
+              {/* Order Status */}
               <div className="flex flex-wrap items-center justify-between bg-gray-50 p-4 rounded-lg gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Order Status</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{getStatusIcon(selectedOrder.status)}</span>
-                    <p className={`font-bold ${selectedOrder.isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {selectedOrder.isPaid ? "Payment Completed" : "Payment Pending"}
-                    </p>
-                  </div>
+                  <p className={`font-bold ${selectedOrder.isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
+                    {selectedOrder.isPaid ? "Payment Completed" : "Payment Pending"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Date</p>
@@ -826,23 +643,7 @@ function Orders() {
                 </div>
               </div>
 
-              {/* Status Update Dropdown */}
-              <div className="flex items-center gap-4">
-                <label className="font-medium text-gray-700">Update Order Status:</label>
-                <select
-                  value={selectedOrder.status || 'Order Placed'}
-                  onChange={(e) => updateOrderStatus(selectedOrder._id, e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="Order Placed">Order Placed</option>
-                  <option value="Processing">Processing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* Transaction ID */}
+              {/* Transaction ID Section */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -868,57 +669,192 @@ function Orders() {
                 </div>
               </div>
 
-              {/* Order Items */}
+              {/* Order Items Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                     <Package className="w-5 h-5" />
                     Order Items ({selectedOrder.items?.length || 0})
                   </h4>
+                  <div className="text-sm text-gray-500">
+                    GST included in prices
+                  </div>
                 </div>
                 
                 {selectedOrder.items && selectedOrder.items.length > 0 ? (
                   <div className="space-y-4">
                     {selectedOrder.items.map((item, index) => {
-                      const product = item.product || {};
+                      const hasSubcategory = ["Crop", "Fertilizer", "Pesticide"].includes(item?.product?.category);
+                      const gstPercentage = item?.product?.gstPercentage || 5;
+                      const unitPrice = item?.product?.offerPrice || item?.product?.price || 0;
+                      const quantity = item?.quantity || 1;
+                      const subtotal = unitPrice * quantity;
+                      const gstAmount = (subtotal * gstPercentage) / 100;
+                      const itemTotal = subtotal + gstAmount;
+                      
                       return (
-                        <div key={index} className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-                          <div className="flex items-start gap-4">
-                            <div className="w-20 h-20 bg-white border border-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                              <img 
-                                src={product.image?.[0] || assets.default_product} 
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-bold text-gray-800 text-lg">{product.name || 'Unknown Product'}</p>
-                                  <p className="text-sm text-gray-500 mt-1">Qty: {item.quantity || 1}</p>
+                        <div key={index} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                          <div className="p-4">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                              <div className="flex items-start gap-4 flex-1">
+                                <div className="w-16 h-16 bg-white border border-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                                  <img 
+                                    src={item?.product?.image?.[0] || assets.default_product} 
+                                    alt={item?.product?.name}
+                                    className="w-full h-full object-cover"
+                                  />
                                 </div>
-                                <p className="font-bold text-green-600 text-xl">
-                                  ₹{((product.offerPrice || product.price || 0) * (item.quantity || 1)).toFixed(2)}
-                                </p>
-                              </div>
-                              
-                              {product.category && (
-                                <div className="mt-3 flex items-center gap-2">
-                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                    {product.category}
-                                  </span>
-                                  {product.subCategory && (
-                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                                      {product.subCategory}
-                                    </span>
+                                <div className="space-y-2 flex-1">
+                                  <div>
+                                    <p className="font-bold text-gray-800 text-lg">{item?.product?.name || 'Unknown Product'}</p>
+                                    <p className="text-sm text-gray-500">
+                                      Product ID: {item?.product?._id?.slice(-8) || 'N/A'}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Category and Subcategory Badges */}
+                                  {item?.product?.category && (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <Tag className="w-3 h-3 text-gray-500" />
+                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(item.product.category)}`}>
+                                          {item.product.category}
+                                        </span>
+                                      </div>
+                                      
+                                      {hasSubcategory && item?.product?.subCategory && (
+                                        <div className="flex items-center gap-1">
+                                          <Layers className="w-3 h-3 text-gray-500" />
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${getSubCategoryColor(item.product.category, item.product.subCategory)}`}>
+                                            {getSubCategoryEmoji(item.product.category, item.product.subCategory)} {item.product.subCategory}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Weight/Size Info */}
+                                  {item?.product?.weightValue && (
+                                    <div className="text-sm text-gray-600">
+                                      <span className="font-medium">Weight: </span>
+                                      {item.product.weightValue} {item.product.weightUnit}
+                                    </div>
                                   )}
                                 </div>
-                              )}
+                              </div>
+                              
+                              <div className="text-right space-y-2 min-w-[120px]">
+                                <div>
+                                  <p className="text-sm text-gray-500">Unit Price</p>
+                                  <p className="font-bold text-gray-800">₹{unitPrice.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Quantity</p>
+                                  <p className="font-bold text-gray-800">{quantity}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">GST ({gstPercentage}%)</p>
+                                  <p className="font-bold text-gray-800">₹{gstAmount.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Item Total</p>
+                                  <p className="font-bold text-green-600 text-xl">₹{itemTotal.toFixed(2)}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Product Details Summary */}
+                          <div className="bg-gray-100 px-4 py-3 border-t border-gray-200">
+                            <div className="flex flex-wrap items-center justify-between text-sm">
+                              <div className="flex items-center gap-4">
+                                {item?.product?.category && (
+                                  <span className="text-gray-600">
+                                    Category: <span className="font-medium">{item.product.category}</span>
+                                  </span>
+                                )}
+                                {item?.product?.subCategory && (
+                                  <span className="text-gray-600">
+                                    Subcategory: <span className="font-medium">{item.product.subCategory}</span>
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-gray-600">
+                                Item Total (incl. GST): <span className="font-bold text-green-700">₹{itemTotal.toFixed(2)}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       );
                     })}
+                    
+                    {/* Order Summary with GST Breakdown */}
+                    <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                      <h5 className="text-lg font-bold text-gray-800 mb-4">Order Summary</h5>
+                      <div className="space-y-3">
+                        {/* Calculate totals */}
+                        {(() => {
+                          let subtotal = 0;
+                          let totalGST = 0;
+                          let gstBreakdown = {};
+                          
+                          selectedOrder.items?.forEach(item => {
+                            const gstPercentage = item?.product?.gstPercentage || 5;
+                            const unitPrice = item?.product?.offerPrice || item?.product?.price || 0;
+                            const quantity = item?.quantity || 1;
+                            const itemSubtotal = unitPrice * quantity;
+                            const gstAmount = (itemSubtotal * gstPercentage) / 100;
+                            
+                            subtotal += itemSubtotal;
+                            totalGST += gstAmount;
+                            
+                            if (!gstBreakdown[gstPercentage]) {
+                              gstBreakdown[gstPercentage] = 0;
+                            }
+                            gstBreakdown[gstPercentage] += gstAmount;
+                          });
+                          
+                          const grandTotal = subtotal + totalGST;
+                          
+                          return (
+                            <>
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Subtotal ({selectedOrder.items?.length || 0} items)</span>
+                                <span className="font-bold">₹{subtotal.toFixed(2)}</span>
+                              </div>
+                              
+                              {/* GST Breakdown */}
+                              <div className="pl-4 border-l-2 border-gray-300">
+                                <p className="text-sm font-medium text-gray-600 mb-2">GST Breakdown:</p>
+                                {Object.entries(gstBreakdown).map(([percentage, amount]) => (
+                                  <div key={percentage} className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">{percentage}% GST</span>
+                                    <span>₹{amount.toFixed(2)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                                <span className="text-gray-600">Total GST</span>
+                                <span className="font-bold">₹{totalGST.toFixed(2)}</span>
+                              </div>
+                              
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-600">Shipping Fee</span>
+                                <span className="font-bold text-green-600">FREE</span>
+                              </div>
+                              
+                              <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                                <span className="text-xl font-bold text-gray-800">Grand Total</span>
+                                <span className="text-2xl font-bold text-green-600">
+                                  ₹{grandTotal.toFixed(2)}
+                                </span>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -981,4 +917,4 @@ function Orders() {
   )
 }
 
-export default Orders;
+export default Order;

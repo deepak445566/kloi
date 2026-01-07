@@ -11,19 +11,7 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, default: 'Order Placed' },
   paymentType: { type: String, required: true, default: 'Online' },
   isPaid: { type: Boolean, required: true, default: false },
-  transactionId: { type: String, required: true },
-  
-  // Shiprocket fields
-  shiprocketOrderId: { type: String },
-  shiprocketShipmentId: { type: String },
-  awbNumber: { type: String },
-  shiprocketStatus: { 
-    type: String, 
-    enum: ['Not initiated', 'Created', 'AWB Generated', 'Picked Up', 'In Transit', 'Delivered', 'Cancelled'],
-    default: 'Not initiated'
-  },
-  courierName: { type: String },
-  trackingUrl: { type: String }
+  transactionId: { type: String, required: true } // ✅ Transaction ID required
 }, { timestamps: true });
 
 const Order = mongoose.models.order || mongoose.model('order', orderSchema);

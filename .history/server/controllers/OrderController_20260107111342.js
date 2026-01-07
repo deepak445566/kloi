@@ -6,7 +6,7 @@ import Address from "../models/Address.js";
 import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
 
-
+import { sendOrderNotification } from "../utils/whatsappUtils.js";
 import ShiprocketAPI from "../config/shiprocket.js";
 
 export const placeOrderOnline = async (req, res) => {

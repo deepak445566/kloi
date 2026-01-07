@@ -22,7 +22,6 @@ import TermsAndConditions from './pages/Term';
 import ReturnRefundPolicy from './pages/Return';
 import PrivacyPolicy from './pages/Policy';
 import Contact from './components/Contact';
-import ShiprocketShipping from './pages/seller/ShiprocketShipping';
 
 function App() {
   const isSellerPath = useLocation().pathname.includes("seller");

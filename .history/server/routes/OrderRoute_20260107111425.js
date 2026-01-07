@@ -5,8 +5,7 @@ import {
   getUserOrders,  
   placeOrderOnline,
   getOrderWhatsAppLink, 
-  generateShippingLabel,
-  trackShipment
+  generateShippingLabel
 } from "../controllers/OrderController.js";
 import authSeller from "../middlewares/authSeller.js";
 import authUser from "../middlewares/authUser.js";
