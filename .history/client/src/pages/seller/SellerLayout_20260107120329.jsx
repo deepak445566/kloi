@@ -1,9 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 
-
+import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
-import { assets } from "../../assets/assets";
-import { useAppContext } from "../../context/AppContext";
 
 const SellerLayout = () => {
   const { setIsSeller, axios, navigate } = useAppContext();
