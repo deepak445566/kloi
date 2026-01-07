@@ -6,7 +6,85 @@ import {
   ExternalLink, ChevronDown, ChevronUp, AlertCircle,
   ShoppingBag, Shield, Mail, Navigation, Target,
   ArrowRight, Download, Printer, Copy, Eye,
-  TrendingUp, TrendingDown, BarChart, Loader2
+  TrendingUp, TrendingDown, BarChart, Loader2,
+  DollarSign, Box, CheckSquare, AlertTriangle,
+  Info, HelpCircle, MessageSquare, FileText,
+  Home, User as UserIcon, ShoppingCart, Tag,
+  Percent, Star, Shield as ShieldIcon, Lock,
+  Unlock, Heart, Share2, Send, Plus, Minus,
+  Search, Filter, SortAsc, SortDesc, MoreVertical,
+  Edit, Trash2, Archive, ArchiveRestore, RotateCcw,
+  Play, Pause, Stop, SkipBack, SkipForward,
+  FastForward, Rewind, ChevronLeft, ChevronRight,
+  ChevronsLeft, ChevronsRight, ZoomIn, ZoomOut,
+  Maximize2, Minimize2, X as XIcon, Check,
+  Radio, ToggleLeft, ToggleRight, Eye as EyeIcon,
+  EyeOff, Camera, Image, Video, Music, Mic,
+  Headphones, Volume2, VolumeX, Bell, BellOff,
+  Settings, Menu, Grid, List, Columns, Layout,
+  Sidebar, SidebarClose, SidebarOpen, PanelLeft,
+  PanelRight, PanelTop, PanelBottom, Split,
+  Combine, Grid3x3, Square, Circle, Triangle,
+  Hexagon, Octagon, Cross, Star as StarIcon,
+  Heart as HeartIcon, ThumbsUp, ThumbsDown,
+  Flag, Award, Trophy, Medal, Target as TargetIcon,
+  Zap, Cloud, CloudRain, CloudSnow, CloudLightning,
+  Sun, Moon, Sunrise, Sunset, Wind, Thermometer,
+  Droplets, Umbrella, CloudSun, CloudMoon,
+  CloudDrizzle, CloudFog, CloudHail, CloudSleet,
+  CloudWind, Hurricane, Tornado, Snowflake,
+  ThermometerSun, ThermometerSnowflake, Droplet,
+  Thermometer as ThermometerIcon, Compass,
+  Map as MapIcon, Navigation as NavigationIcon,
+  Globe, Layers, Database, Server, HardDrive,
+  Cpu, MemoryStick, Monitor, Smartphone, Tablet,
+  Watch, Camera as CameraIcon, Video as VideoIcon,
+  Headphones as HeadphonesIcon, Speaker, Mic as MicIcon,
+  Gamepad, Keyboard, Mouse, HardDrive as HardDriveIcon,
+  Printer as PrinterIcon, Scanner, Router, Wifi,
+  Bluetooth, Radio as RadioIcon, Tv, Remote,
+  Battery, BatteryCharging, BatteryFull, BatteryLow,
+  BatteryMedium, Power, Plug, Zap as ZapIcon,
+  Shield as ShieldIcon2, Lock as LockIcon2,
+  Unlock as UnlockIcon2, Key, Fingerprint, QrCode,
+  Barcode, CreditCard as CreditCardIcon2,
+  Wallet, Banknote, Coins, Gem, Crown, Sword,
+  Shield as ShieldIcon3, Skull, Ghost,
+ Rocket, Satellite, UFO, Meteor,
+  Planet, Globe as GlobeIcon2, Moon as MoonIcon2,
+  Sun as SunIcon2, Star as StarIcon2, Cloud as CloudIcon2,
+  Fire, Water, Leaf, Tree, Flower, Cactus, Apple,
+  Banana, Carrot, Pizza, Coffee, Wine, Beer, Cake,
+  Cookie, IceCream, Candy, Pizza as PizzaIcon,
+  Hamburger, Hotdog, Sandwich, Sushi, Taco, Burrito,
+  Ramen, Egg, Milk, Cheese, Fish, Chicken,
+  Beef, Egg as EggIcon, Milk as MilkIcon,
+  Cheese as CheeseIcon, Bread as BreadIcon,
+  Fish as FishIcon, Chicken as ChickenIcon,
+  Beef as BeefIcon, Apple as AppleIcon,
+  Banana as BananaIcon, Carrot as CarrotIcon,
+  Leaf as LeafIcon, Tree as TreeIcon, Flower as FlowerIcon,
+  Cactus as CactusIcon, Mountain, Tent, Campfire,
+  MapPin as MapPinIcon, Navigation2, Compass as CompassIcon,
+  Flag as FlagIcon, Anchor, Sailboat, Ship as ShipIcon,
+  Car, Bike, Bus, Train, Plane, Helicopter, Rocket as RocketIcon,
+  Truck as TruckIcon3, Package as PackageIcon,
+  Box as BoxIcon, Pallet, Forklift, Warehouse,
+  Factory, Store, ShoppingCart as ShoppingCartIcon,
+  Tag as TagIcon, Percent as PercentIcon, Ticket,
+  Gift, Package as PackageIcon2, Box as BoxIcon2,
+  Cube, Cuboid, Sphere, Cylinder, Cone, Pyramid,
+  Diamond, Octahedron, Dodecahedron, Icosahedron,
+  Torus, Cylinder as CylinderIcon, Cone as ConeIcon,
+  Pyramid as PyramidIcon, Diamond as DiamondIcon,
+  Octahedron as OctahedronIcon, Dodecahedron as DodecahedronIcon,
+  Icosahedron as IcosahedronIcon, Torus as TorusIcon,
+  Cube as CubeIcon, Cuboid as CuboidIcon,
+  Sphere as SphereIcon, Cylinder as CylinderIcon2,
+  Cone as ConeIcon2, Pyramid as PyramidIcon2,
+  Diamond as DiamondIcon2, Octahedron as OctahedronIcon2,
+  Dodecahedron as DodecahedronIcon2, Icosahedron as IcosahedronIcon2,
+  Torus as TorusIcon2
 } from "lucide-react";
 
 function Myorders() {
@@ -17,6 +95,7 @@ function Myorders() {
   const [refreshing, setRefreshing] = useState(false);
   const [downloadingInvoice, setDownloadingInvoice] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchOrders = async () => {
     try {
@@ -27,6 +106,7 @@ function Myorders() {
       }
     } catch (error) {
       console.log("Error fetching orders:", error);
+      toast.error("Failed to fetch orders");
     } finally {
       setLoading(false);
     }
@@ -41,20 +121,27 @@ function Myorders() {
             ? { ...order, trackingData: data.tracking, status: data.status }
             : order
         ));
+        toast.success("Tracking updated!");
       }
     } catch (error) {
       console.log("Error refreshing tracking:", error);
+      toast.error("Failed to update tracking");
     }
   };
 
   const refreshAllTracking = async () => {
     setRefreshing(true);
-    for (const order of myOrders) {
-      if (order.awbCode) {
-        await refreshTracking(order._id);
+    try {
+      for (const order of myOrders) {
+        if (order.awbCode) {
+          await refreshTracking(order._id);
+        }
       }
+    } catch (error) {
+      console.error("Error refreshing all tracking:", error);
+    } finally {
+      setRefreshing(false);
     }
-    setRefreshing(false);
   };
 
   const downloadInvoice = async (order) => {
@@ -71,11 +158,39 @@ function Myorders() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      
+      toast.success("Invoice downloaded successfully!");
     } catch (error) {
       console.error("Download error:", error);
+      toast.error("Failed to download invoice");
     } finally {
       setDownloadingInvoice(null);
     }
+  };
+
+  const downloadLabel = async (orderId) => {
+    try {
+      const { data } = await axios.get(`/api/order/label/${orderId}`);
+      if (data.success && data.labelUrl) {
+        window.open(data.labelUrl, '_blank');
+      }
+    } catch (error) {
+      toast.error("Failed to download label");
+    }
+  };
+
+  const trackOnShiprocket = (awbCode) => {
+    if (awbCode) {
+      window.open(`https://shiprocket.co/tracking/${awbCode}`, '_blank');
+    }
+  };
+
+  const copyToClipboard = (text, label = '') => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(`${label} copied to clipboard!`);
+    }).catch(() => {
+      toast.error('Failed to copy');
+    });
   };
 
   useEffect(() => {
@@ -109,30 +224,54 @@ function Myorders() {
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return 'Invalid Date';
+    }
   };
 
-  const trackOnShiprocket = (awbCode) => {
-    window.open(`https://shiprocket.co/tracking/${awbCode}`, '_blank');
-  };
-
-  const copyToClipboard = (text, label = '') => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert(`${label} copied to clipboard!`);
-    });
+  const formatShortDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short'
+      });
+    } catch {
+      return '';
+    }
   };
 
   const getFilteredOrders = () => {
-    if (statusFilter === 'all') return myOrders;
-    return myOrders.filter(order => order.status === statusFilter);
+    let filtered = myOrders;
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(order => 
+        order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.awbCode?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
   };
+
+  const filteredOrders = getFilteredOrders();
 
   if (loading) {
     return (
@@ -156,7 +295,7 @@ function Myorders() {
             <p className="text-gray-500 mt-2">You haven't placed any orders</p>
             <button 
               onClick={() => window.location.href = '/products'}
-              className="mt-6 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              className="mt-6 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
             >
               Start Shopping
             </button>
@@ -177,6 +316,16 @@ function Myorders() {
               <p className="text-gray-600 mt-1">Total {myOrders.length} order(s)</p>
             </div>
             <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -204,7 +353,7 @@ function Myorders() {
 
         {/* Orders List */}
         <div className="space-y-4">
-          {getFilteredOrders().map((order) => (
+          {filteredOrders.map((order) => (
             <div 
               key={order._id} 
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
@@ -307,6 +456,13 @@ function Myorders() {
                           >
                             <ExternalLink className="w-4 h-4" />
                             Track on Shiprocket
+                          </button>
+                          <button
+                            onClick={() => downloadLabel(order._id)}
+                            className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition text-sm font-medium flex items-center gap-2"
+                          >
+                            <Download className="w-4 h-4" />
+                            Label
                           </button>
                         </div>
                       </div>
@@ -447,7 +603,7 @@ function Myorders() {
                           <div>
                             <p className="text-gray-800">{order.address.street}</p>
                             <p className="text-gray-600">
-                              {order.address.city}, {order.address.state} - {order.address.zipcode}
+                              {order.address.city}, {order.address.state} - {order.address.pincode}
                             </p>
                             <p className="text-gray-600">{order.address.country || 'India'}</p>
                           </div>
@@ -473,6 +629,24 @@ function Myorders() {
             </div>
           ))}
         </div>
+
+        {/* Empty State */}
+        {filteredOrders.length === 0 && (
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 text-lg">No orders found</p>
+            <p className="text-gray-500 text-sm mt-2">Try adjusting your filters</p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+              }}
+              className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
