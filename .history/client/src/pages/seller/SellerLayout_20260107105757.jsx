@@ -10,7 +10,7 @@ const SellerLayout = () => {
     { name: "Add Products", path: "/seller", icon: assets.add_icon },
     { name: "Product List", path: "/seller/product-list", icon: assets.product_list_icon },
     { name: "Orders", path: "/seller/orders", icon: assets.order_icon },
-    { name: "Shiprocket", path: "/seller/shiprocket", icon: "🚚"}, // NEW
+    { name: "Shiprocket", path: "/seller/shiprocket", icon: assets.shipment_icon }, // NEW
   ];
 
   // Shiprocket icon add करें assets में अगर नहीं है

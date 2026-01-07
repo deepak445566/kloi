@@ -22,8 +22,6 @@ import TermsAndConditions from './pages/Term';
 import ReturnRefundPolicy from './pages/Return';
 import PrivacyPolicy from './pages/Policy';
 import Contact from './components/Contact';
-import ShiprocketDashboard from './components/seller/ShiprocketDashboard';
-import OrderTracking from './components/User/OrderTracking';
 
 function App() {
   const isSellerPath = useLocation().pathname.includes("seller");
@@ -50,7 +48,6 @@ function App() {
             <Route path='/product/:id' element={<ProductDetail/>}/>
             
             <Route path='/cart' element={<Cart/>}/>
-             <Route path='/order-tracking/:orderId' element={<OrderTracking/>}/>
             <Route path='/add-address' element={<Addaddress/>}/>
             <Route path='/myOrders' element={<Myorders/>}/>
             <Route path="/loader" element={<Loading/>}/>

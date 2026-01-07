@@ -23,7 +23,6 @@ import ReturnRefundPolicy from './pages/Return';
 import PrivacyPolicy from './pages/Policy';
 import Contact from './components/Contact';
 import ShiprocketDashboard from './components/seller/ShiprocketDashboard';
-import OrderTracking from './components/User/OrderTracking';
 
 function App() {
   const isSellerPath = useLocation().pathname.includes("seller");
