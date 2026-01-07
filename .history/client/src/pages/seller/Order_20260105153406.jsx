@@ -102,7 +102,7 @@ function Order() {
             <p style="margin: 5px 0; color: #555;"><strong>KuntalAgroAgencies</strong></p>
             <p style="margin: 5px 0; color: #555;">Farm & Garden Products</p>
             <p style="margin: 5px 0; color: #555;">+918586845185 </p>
-           
+            <p style="margin: 5px 0; color: #555;">GSTIN: 27ABCDE1234F1Z5</p>
           </div>
           
           ${order.address ? `
@@ -204,9 +204,11 @@ function Order() {
 
         <!-- Footer -->
         <div style="border-top: 2px solid #4FBF8B; padding-top: 20px; margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
-          <p>Thank you for your business with KuntalAgroAgencies</p>
-          <p>For any queries, contact: +91 8586845185 </p>
-         
+          <p>Thank you for your business with GreenMantra!</p>
+          <p>For any queries, contact: +91 9911577652 | Email: support@greenmantra.com</p>
+          <p style="margin-top: 20px; font-size: 10px; color: #999;">
+            This is a computer-generated invoice. No signature required.
+          </p>
         </div>
       </div>
     `;

@@ -10,7 +10,6 @@ import ProductRouter from './routes/ProductRoute.js';
 import cartRouter from './routes/CardRoute.js';
 import addressRouter from './routes/AddressRoute.js';
 import orderRouter from './routes/OrderRoute.js';
-import shiprocketRouter from './routes/shiprocketRouter.js';
 
 dotenv.config();
 const app = express();

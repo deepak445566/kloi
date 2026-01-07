@@ -5,7 +5,11 @@ import User from "../models/User.js";
 import Address from "../models/Address.js";
 import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
-
+import Order from "../models/Order.js";
+import Product from "../models/Product.js";
+import User from "../models/User.js";
+import Address from "../models/Address.js";
+import { sendOrderNotification } from "../utils/whatsappUtils.js";
 import { ShiprocketService } from "../services/shiprocketService.js";
 
 export const placeOrderOnline = async (req, res) => {
@@ -195,7 +199,7 @@ export const placeOrderOnline = async (req, res) => {
   }
 };
 
-
+// Rest of your existing controller functions...
 
 // ✅ Get user orders - userId auth se aayega
 export const getUserOrders = async(req, res)=>{

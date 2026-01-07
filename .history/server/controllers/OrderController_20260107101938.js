@@ -5,7 +5,7 @@ import User from "../models/User.js";
 import Address from "../models/Address.js";
 import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
-
+import { sendOrderNotification } from "../utils/whatsappUtils.js";
 import { ShiprocketService } from "../services/shiprocketService.js";
 
 export const placeOrderOnline = async (req, res) => {
