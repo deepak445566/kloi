@@ -1,0 +1,21 @@
+// routes/orderRouter.js
+import express from "express";
+import { 
+  getAllOrders, 
+  getUserOrders,  
+  placeOrderOnline,
+  getOrderWhatsAppLink 
+} from "../controllers/OrderController.js";
+import authSeller from "../middlewares/authSeller.js";
+import authUser from "../middlewares/authUser.js";
+import { generateLabel, trackShipment } from "../controllers/shiprocketController.js";
+
+const orderRouter = express.Router();
+
+orderRouter.post('/cod', authUser, placeOrderOnline);
+orderRouter.get('/user', authUser, getUserOrders);
+orderRouter.get('/seller', authSeller, getAllOrders);
+orderRouter.get('/whatsapp/:orderId', authSeller, getOrderWhatsAppLink);
+orderRouter.post("/generate-label/:orderId", authSeller, generateLabel);
+orderRouter.get("/track/:orderId", authSeller, trackShipment);
+export default orderRouter;

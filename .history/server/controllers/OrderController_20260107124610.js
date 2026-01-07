@@ -7,9 +7,11 @@ import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
 
 import ShiprocketService from "../services/shiprocket.service.js";
+import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
+// ... (keep existing placeOrderOnline, getUserOrders, getAllOrders, getOrderWhatsAppLink functions)
 
-
+// ✅ Shiprocket: Create shipment and generate AWB
 export const createShiprocketShipment = async (req, res) => {
   try {
     const { orderId } = req.params;

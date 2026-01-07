@@ -5,11 +5,17 @@ import User from "../models/User.js";
 import Address from "../models/Address.js";
 import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
-
+// controllers/OrderController.js - Updated with Shiprocket
+import Order from "../models/Order.js";
+import Product from "../models/Product.js";
+import User from "../models/User.js";
+import Address from "../models/Address.js";
 import ShiprocketService from "../services/shiprocket.service.js";
+import { sendOrderNotification } from "../utils/whatsappUtils.js";
 
+// ... (keep existing placeOrderOnline, getUserOrders, getAllOrders, getOrderWhatsAppLink functions)
 
-
+// ✅ Shiprocket: Create shipment and generate AWB
 export const createShiprocketShipment = async (req, res) => {
   try {
     const { orderId } = req.params;
