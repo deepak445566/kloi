@@ -90,9 +90,9 @@ function Footer() {
     {
       title: "Support",
       links: [
-        { text: "Terms & Condition", url: "/term" },
-        
-        { text: "Returns", url: "/return" },
+        { text: "FAQ", url: "/faq" },
+        { text: "Shipping", url: "/shipping" },
+        { text: "Returns", url: "/returns" },
         { text: "Privacy Policy", url: "/policy" }
       ]
     },
