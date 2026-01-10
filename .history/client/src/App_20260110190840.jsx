@@ -22,7 +22,6 @@ import TermsAndConditions from './pages/Term';
 import ReturnRefundPolicy from './pages/Return';
 import PrivacyPolicy from './pages/Policy';
 import Contact from './components/Contact';
-import ShippingPolicy from './pages/ShippingPolicy';
 
 function App() {
   const isSellerPath = useLocation().pathname.includes("seller");
@@ -55,7 +54,7 @@ function App() {
             <Route path="/term" element={<TermsAndConditions/>}/>
             <Route path="/return" element={<ReturnRefundPolicy/>}/>
             <Route path='/policy' element={<PrivacyPolicy/>}/>
-            <Route path="/shipping" element={<ShippingPolicy/>}/>
+            <Route path=""
 <Route path='/contact' element={<Contact/>}/>
             <Route path='/seller' element={isSeller?<SellerLayout/> :<SellerLogin/>}>
               <Route index element={isSeller?<Addproduct/>:null} />

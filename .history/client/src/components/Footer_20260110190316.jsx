@@ -91,7 +91,7 @@ function Footer() {
       title: "Support",
       links: [
         { text: "Terms & Condition", url: "/term" },
-          { text: "Shipping Policy", url: "/shipping" },
+        
         { text: "Returns", url: "/return" },
         { text: "Privacy Policy", url: "/policy" }
       ]
@@ -246,9 +246,9 @@ function Footer() {
         </div>
         
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-gray-300">
+        <div className="pt-8 border-t border-gray-300 ">
           {/* Copyright & Legal */}
-          <div className="flex flex-col md:flex-row justify-between items-center">
+         
             <div className="text-center md:text-left mb-4 md:mb-0">
               <p className="text-gray-600">
                 © {new Date().getFullYear()} Kuntal Agro Agencies. All Rights Reserved.
@@ -257,22 +257,9 @@ function Footer() {
                 Udyam Registered • GSTIN: XXXXXXXXXXXXXX
               </p>
             </div>
-             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
-            <div className="text-gray-600 text-sm font-medium">Secure Payments Accepted:</div>
-            <div className="flex gap-2 flex-wrap justify-center">
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                UPI Payments
-              </div>
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                Cash on Delivery
-              </div>
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                Card Payments
-              </div>
-            </div>
-          </div>
+            
           
-          </div>
+        
           
           {/* Developer Credit */}
           <div className="text-center mt-8 pt-6 border-t border-gray-300">
@@ -290,7 +277,20 @@ function Footer() {
           </div>
           
           {/* Payment Methods */}
-         
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+            <div className="text-gray-600 text-sm font-medium">Secure Payments Accepted:</div>
+            <div className="flex gap-2 flex-wrap justify-center">
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                UPI Payments
+              </div>
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                Cash on Delivery
+              </div>
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                Card Payments
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       

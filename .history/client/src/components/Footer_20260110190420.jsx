@@ -91,7 +91,7 @@ function Footer() {
       title: "Support",
       links: [
         { text: "Terms & Condition", url: "/term" },
-          { text: "Shipping Policy", url: "/shipping" },
+        
         { text: "Returns", url: "/return" },
         { text: "Privacy Policy", url: "/policy" }
       ]
@@ -257,21 +257,21 @@ function Footer() {
                 Udyam Registered • GSTIN: XXXXXXXXXXXXXX
               </p>
             </div>
-             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
-            <div className="text-gray-600 text-sm font-medium">Secure Payments Accepted:</div>
-            <div className="flex gap-2 flex-wrap justify-center">
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                UPI Payments
-              </div>
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                Cash on Delivery
-              </div>
-              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
-                Card Payments
-              </div>
+            
+            <div className="flex flex-wrap justify-center gap-6">
+              <a href="/privacy" className="text-gray-600 hover:text-green-700 transition-colors text-sm">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-gray-600 hover:text-green-700 transition-colors text-sm">
+                Terms of Service
+              </a>
+              <a href="/shipping" className="text-gray-600 hover:text-green-700 transition-colors text-sm">
+                Shipping Policy
+              </a>
+              <a href="/returns" className="text-gray-600 hover:text-green-700 transition-colors text-sm">
+                Return Policy
+              </a>
             </div>
-          </div>
-          
           </div>
           
           {/* Developer Credit */}
@@ -290,7 +290,20 @@ function Footer() {
           </div>
           
           {/* Payment Methods */}
-         
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+            <div className="text-gray-600 text-sm font-medium">Secure Payments Accepted:</div>
+            <div className="flex gap-2 flex-wrap justify-center">
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                UPI Payments
+              </div>
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                Cash on Delivery
+              </div>
+              <div className="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 text-sm border border-gray-200">
+                Card Payments
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       

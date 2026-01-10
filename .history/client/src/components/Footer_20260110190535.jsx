@@ -91,7 +91,7 @@ function Footer() {
       title: "Support",
       links: [
         { text: "Terms & Condition", url: "/term" },
-          { text: "Shipping Policy", url: "/shipping" },
+          { text: "Shipping Policy", url: "/return" },
         { text: "Returns", url: "/return" },
         { text: "Privacy Policy", url: "/policy" }
       ]
