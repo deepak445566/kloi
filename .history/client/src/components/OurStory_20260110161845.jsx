@@ -88,7 +88,7 @@ const OurStory = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white mt-10">
+    <div className="min-h-screen bg-white ">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-green-900 via-emerald-800 to-green-700 text-white py-8 md:py-16 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 bg-black opacity-20"></div>
