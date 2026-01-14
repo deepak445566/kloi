@@ -47,12 +47,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Server is running'
-  });
-});
+
 
 app.use('/api/user', UserRouter);
 app.use('/api/seller', sellerRouter);

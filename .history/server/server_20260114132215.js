@@ -47,11 +47,47 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
+// Health check
 app.get('/api/health', (req, res) => {
+  const mongoStates = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+  
   res.json({ 
     success: true, 
-    message: 'Server is running'
+    message: 'Server is running',
+    mongoStatus: mongoStates[mongoose.connection.readyState] || 'unknown',
+    readyState: mongoose.connection.readyState
   });
+});
+
+// ✅ Simple ping route (without keepalive)
+app.get('/api/ping', async (req, res) => {
+  try {
+    const start = Date.now();
+    
+    // Simple query - just count documents
+    const result = await mongoose.connection.db.command({ ping: 1 });
+    
+    const duration = Date.now() - start;
+    
+    res.json({ 
+      success: true, 
+      message: 'Ping successful',
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Ping failed',
+      error: error.message 
+    });
+  }
 });
 
 app.use('/api/user', UserRouter);
