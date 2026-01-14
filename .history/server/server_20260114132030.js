@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-
+// ... existing code ...
 
 // Health route
 app.get('/api/health', (req, res) => {
@@ -96,7 +96,7 @@ app.get('/api/warmup', (req, res) => {
   });
 });
 
-
+// ... existing routes continue ...
 
 app.use('/api/user', UserRouter);
 app.use('/api/seller', sellerRouter);

@@ -49,55 +49,6 @@ app.get('/', (req, res) => {
 
 
 
-// Health route
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Server is running',
-    mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
-  });
-});
-
-// 🆕 NEW: Keep-alive route (Vercel/Render ke liye IMPORTANT)
-app.get('/api/keepalive', async (req, res) => {
-  try {
-    // Simple MongoDB query to keep connection alive
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.connection.db.admin().ping();
-      res.json({ 
-        success: true, 
-        message: 'MongoDB connection alive',
-        timestamp: new Date().toLocaleString()
-      });
-    } else {
-      // Reconnect if disconnected
-      await connectDB();
-      res.json({ 
-        success: true, 
-        message: 'MongoDB reconnected',
-        timestamp: new Date().toLocaleString()
-      });
-    }
-  } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: 'MongoDB keep-alive failed',
-      error: error.message 
-    });
-  }
-});
-
-// 🆕 NEW: Simple warm-up route
-app.get('/api/warmup', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'Server warmed up',
-    readyState: mongoose.connection.readyState
-  });
-});
-
-
-
 app.use('/api/user', UserRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/product', ProductRouter);
