@@ -23,7 +23,7 @@ await connectCloudinary();
 // Simple CORS configuration
 
 app.use(cors({
-  origin: ["https://kloi-one.vercel.app", "https://okreportnew.vercel.app"],
+  origin: "https://kloi-one.vercel.app || "https://okreportnew.vercel.app/",
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
