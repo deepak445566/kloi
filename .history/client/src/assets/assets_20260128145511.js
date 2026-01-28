@@ -25,7 +25,13 @@ import main_banner_bg_sm from "./main_banner_bg_sm.png";
 import bottom_banner_image from "./bottom_banner_image.png";
 import bottom_banner_image_sm from "./bottom_banner_image_sm.png";
 import add_address_iamge from "./add_address_image.svg";
-
+import organic_vegitable_image from "./organic_vegitable_image.png";
+import fresh_fruits_image from "./fresh_fruits_image.png";
+import bottles_image from "./bottles_image.png";
+import maggi_image from "./maggi_image.png";
+import dairy_product_image from "./dairy_product_image.png";
+import bakery_image from "./bakery_image.png";
+import grain_image from "./grain_image.png";
 
 
 export const assets = {
@@ -173,7 +179,21 @@ export const features = [
 
 
 
-
+export const dummyAddress = [
+  {
+    _id: "67b5b9e54ea97f71bbc196a0",
+    userId: "67b5880e4d09769c5ca61644",
+    firstName: "Great",
+    lastName: "Stack",
+    email: "user.greatstack@gmail.com",
+    street: "Street 123",
+    city: "Main City",
+    state: "New State",
+    zipcode: 123456,
+    country: "IN",
+    phone: "1234567890",
+  },
+];
 
 
 
